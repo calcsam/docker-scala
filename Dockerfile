@@ -40,7 +40,6 @@ RUN \
     \
     echo "===> clean up..."  && \
     rm -f *.deb                            && \
-    apt-get remove -y --auto-remove curl   && \
     apt-get clean                          && \
     rm -rf /var/lib/apt/lists/*
 
@@ -51,7 +50,24 @@ RUN \
 # scala -version returns code 1 instead of 0 thus "|| true"
 #RUN scala -version || true
 
-
-
 # Define default command.
-CMD ["scala"]
+#CMD ["scala"]
+
+#RUN apt-get install yum
+#RUN yum update -y && yum install -y unzip
+RUN apt-get install -y --force-yes curl
+RUN apt-get update  && \
+    DEBIAN_FRONTEND=noninteractive  apt-get install -y --force-yes curl
+
+RUN curl -O http://downloads.typesafe.com/typesafe-activator/1.3.6/typesafe-activator-1.3.6.zip 
+RUN apt-get install unzip
+RUN unzip typesafe-activator-1.3.6.zip -d / && rm typesafe-activator-1.3.6.zip && chmod a+x /activator-dist-1.3.6/activator
+ENV PATH $PATH:/activator-dist-1.3.6
+
+EXPOSE 9000 8888
+RUN mkdir /app
+WORKDIR /app
+
+CMD ["activator", "run"]
+
+
